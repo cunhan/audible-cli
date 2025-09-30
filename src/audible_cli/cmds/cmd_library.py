@@ -130,7 +130,7 @@ async def export_library(session, client, **params):
         *[_prepare_item(i) for i in library]
     )
     prepared_library = [i for i in prepared_library if i is not None]
-    prepared_library.sort(key=lambda x: x["asin"])
+    prepared_library.sort(key=lambda x: x["purchase_date"], reverse=True)
 
     if output_format in ("tsv", "csv"):
         if output_format == "csv":

@@ -40,6 +40,14 @@ pip install .
 
 ```
 
+or install as develop
+
+```shell
+
+pip install -e .
+
+```
+
 or as the best solution using [uvx](https://github.com/astral-sh/uv)
 
 ```shell
