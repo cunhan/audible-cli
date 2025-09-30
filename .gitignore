@@ -138,3 +138,5 @@ dmypy.json
 .pyre/
 
 .idea
+
+audible_meta/
