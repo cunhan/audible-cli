@@ -269,6 +269,7 @@ def get_progressbar(
         desc=description,
         total=total,
         unit="B",
+        ncols=0,
         unit_scale=True,
         unit_divisor=1024
     )
