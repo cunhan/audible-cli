@@ -3,6 +3,8 @@ REM Do not use cmd_decrypt, because extra metadata will be abandoned by FFmpeg.
 REM if using FFmpeg, exiftool -u can restore extra metadata from aaxc to m4b.
 
 timeout /t 5
+
+REM app directory mean config directory, not exe directory.
 set AUDIBLE_PLUGIN_DIR=plugins
 
 for %%F in ("Download\*.aaxc") do (

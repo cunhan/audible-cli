@@ -3,6 +3,7 @@ import time
 
 AUDIBLE_CLI_PATH = 'audible.exe'
 DOWNLOAD_AAXC_DIR = "download"
+DOWNLOAD_M4B_DIR = 'm4b'
 TSV_FILE = 'library.tsv'
 DOWNLOAD_MSG_SKIP = 'Skip download.'
 DOWNLOAD_MSG_NOTFOUND = 'not found in library.'
@@ -10,15 +11,16 @@ DOWNLOAD_MSG_UNAUTH = 'error: License not granted to customer'
 DOWNLOAD_MSG_SUCCESS = 'aaxc downloaded in'
 DOWNLOAD_MSG_SUCCESS_1SEC = 'aaxc downloaded in 0:00:01.'
 DOWNLOAD_MSG_UnPublished = 'is not published. It will be available in'
-DOWNLOAD_INTERVAL = 700
+DOWNLOAD_404 = 'Not Found (404)'
+DOWNLOAD_INTERVAL = 680
 MAXSIZE_ONE_DAY = 40*1000*1000*1000 #40 in 1 day
 
 
 # 收集已经下载并解码的有声书m4b列表。
-M4B_LIB_PATH = "e:\\airu\\Audible-Cli\\m4b"
+# M4B_LIB_PATH = "e:\\airu\\audible-cli-master\\m4b"
 def m4b_lib():
     asins = []
-    for root, dirs, files in os.walk(M4B_LIB_PATH):
+    for root, dirs, files in os.walk(DOWNLOAD_M4B_DIR):
         for file in files:
             asin = os.path.basename(file).split('_')[-1]
             asin = asin[:10]
@@ -39,10 +41,11 @@ def get_library(tsv):
         asin = item[0]
         # 检查本地是否已经下载
         if asin in m4bs:
-            print(asin + " exsited, omit.")
+            # print(asin + " exsited, omit.")
             continue
         lib.append((runtime, asin.strip()))
     # 每天下载100个
+    print(f"total: {len(lib)}/{len(data)}")
     lib = lib[:100]
     #only asin list in tsv
     if len(data[1].strip()) == 10:
@@ -122,18 +125,23 @@ def run_donwload(asin, cli = AUDIBLE_CLI_PATH):
         # about 100 books for one day.
         return DOWNLOAD_INTERVAL
     elif DOWNLOAD_MSG_UnPublished in r:
+        print(r)
         return 1
+    elif DOWNLOAD_404 in r:
+        print(r)
+        return 2
     else:
+        print(r)
         print("[Unknown result]")
-        return -1
+        return -999
 
-successcount = 0
+
 lib = get_library(TSV_FILE)
-# # print sorted asin collection
-# for asin in lib:
-    # print(asin)
 
 total = len(lib)
+if total == 0:
+    print('No new items. Sleep 6 hour.')
+    time.sleep(3600*6)
 print(f'{total} items will be download...')
 i = 1
 for asin in lib:
@@ -159,10 +167,9 @@ for asin in lib:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             r = p.stdout.read().decode('utf-8').strip()
             # print(r)
+        if waitsecond == -999:
+            break
+        print(f"[{i}/{total}] {asin} is processed")
         print(f'Waiting {waitsecond}s...')
         time.sleep(abs(waitsecond))     
     i = i + 1
-
-# print(check_total_oneday())
-# print(run_donwload('fake'))
-# print(run_donwload('B0DQXXXQQC'))
